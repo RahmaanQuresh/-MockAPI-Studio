@@ -9,7 +9,7 @@ const DEFAULT_ROUTES = [
   {
     id: 'r-1',
     method: 'GET',
-    path: '/api/v1/profile',
+    path: '/api/v1/users/:userId',
     status: 200,
     latency: 300,
     headers: [
@@ -18,6 +18,7 @@ const DEFAULT_ROUTES = [
     ],
     body: {
       status: "success",
+      userId: "{{params.userId}}",
       user: {
         id: "{{id}}",
         name: "{{name}}",

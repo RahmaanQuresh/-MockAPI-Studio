@@ -6,6 +6,7 @@ export default function RequestTester({ route, onLogRequest }) {
   const [queryParams, setQueryParams] = useState([{ key: '', value: '' }]);
   const [requestHeaders, setRequestHeaders] = useState([{ key: 'Content-Type', value: 'application/json' }]);
   const [requestBody, setRequestBody] = useState('{\n  \n}');
+  const [pathVariables, setPathVariables] = useState({});
   
   // Test execution state
   const [isSending, setIsSending] = useState(false);
@@ -18,6 +19,15 @@ export default function RequestTester({ route, onLogRequest }) {
       setRequestBody('{\n  \n}');
       setTestResponse(null);
       setIsSending(false);
+      
+      // Parse path variables: e.g. "/api/users/:id" -> { id: '1' }
+      const pathParams = (route.path.match(/:[a-zA-Z0-9_]+/g) || []).map(p => p.slice(1));
+      const initialVars = {};
+      pathParams.forEach(p => {
+        initialVars[p] = '1';
+      });
+      setPathVariables(initialVars);
+
       // Auto switch tabs based on method
       if (route.method === 'GET') {
         setActiveTab('params');
@@ -25,7 +35,7 @@ export default function RequestTester({ route, onLogRequest }) {
         setActiveTab('body');
       }
     }
-  }, [route?.id]);
+  }, [route?.id, route?.path]);
 
   if (!route) {
     return (
@@ -63,6 +73,15 @@ export default function RequestTester({ route, onLogRequest }) {
     return '?' + activeParams.map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`).join('&');
   };
 
+  // Compile path parameters into actual path
+  const getCompiledPath = () => {
+    let path = route.path;
+    Object.entries(pathVariables).forEach(([key, val]) => {
+      path = path.replace(':' + key, val || ':' + key);
+    });
+    return path;
+  };
+
   // Execute Mock Request
   const handleSendRequest = () => {
     setIsSending(true);
@@ -88,6 +107,7 @@ export default function RequestTester({ route, onLogRequest }) {
     const context = {
       query: queryContext,
       body: bodyContext,
+      params: pathVariables,
       headers: requestHeaders.reduce((acc, curr) => {
         if (curr.key.trim() !== '') acc[curr.key.trim()] = curr.value;
         return acc;
@@ -153,7 +173,7 @@ export default function RequestTester({ route, onLogRequest }) {
         id: Math.random().toString(36).substr(2, 9),
         timestamp: new Date().toLocaleTimeString(),
         method: route.method,
-        path: route.path + getQueryString(),
+        path: getCompiledPath() + getQueryString(),
         status: responsePayload.status,
         durationMs,
         size: formattedSize,
@@ -193,9 +213,9 @@ export default function RequestTester({ route, onLogRequest }) {
           <span className={`badge badge-${route.method.toLowerCase()}`} style={{ height: '36px', width: '70px', fontSize: '13px' }}>
             {route.method}
           </span>
-          <div className="input-field input-field-mono" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', background: 'rgba(8, 12, 20, 0.5)', display: 'flex', alignItems: 'center' }}>
+          <div className="input-field input-field-mono" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', background: 'rgba(8, 12, 20, 0.05)', display: 'flex', alignItems: 'center' }}>
             <span style={{ color: 'var(--text-dim)' }}>http://localhost/</span>
-            <span style={{ color: 'var(--color-get)' }}>{route.path.replace(/^\//, '')}</span>
+            <span style={{ color: 'var(--color-get)' }}>{getCompiledPath().replace(/^\//, '')}</span>
             <span style={{ color: 'var(--text-muted)' }}>{getQueryString()}</span>
           </div>
           <button 
@@ -236,6 +256,33 @@ export default function RequestTester({ route, onLogRequest }) {
         <div style={{ minHeight: '130px' }}>
           {activeTab === 'params' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {Object.keys(pathVariables).length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px', borderBottom: '1px dashed var(--border-color)', paddingBottom: '16px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Path Variables</div>
+                  {Object.entries(pathVariables).map(([key, val]) => (
+                    <div key={key} className="header-row" style={{ gridTemplateColumns: '1fr 1fr 32px' }}>
+                      <input
+                        type="text"
+                        className="input-field input-field-mono"
+                        disabled
+                        style={{ padding: '6px 10px', fontSize: '12px', opacity: 0.6, background: 'var(--bg-secondary)' }}
+                        value={`:${key}`}
+                      />
+                      <input
+                        type="text"
+                        className="input-field input-field-mono"
+                        placeholder="Value"
+                        style={{ padding: '6px 10px', fontSize: '12px' }}
+                        value={val}
+                        onChange={(e) => setPathVariables({ ...pathVariables, [key]: e.target.value })}
+                      />
+                      <div style={{ width: '32px' }} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <div style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '2px' }}>Query Parameters</div>
               {queryParams.map((p, idx) => (
                 <div key={idx} className="header-row" style={{ gridTemplateColumns: '1fr 1fr 32px' }}>
                   <input
