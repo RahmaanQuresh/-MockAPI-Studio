@@ -1,68 +1,41 @@
-# 📡 MockAPI Studio
+# MockAPI Studio
 
-> **A Handcrafted, Naturalist Mock API Generator & Client Sandbox**
+MockAPI Studio is a client-side sandbox application that lets you visually design, mock, and test REST API endpoints entirely inside your browser. It includes a built-in mock engine that parses template placeholders, simulates network latency, and logs test history. It also exports your configurations directly to Express.js scripts and OpenAPI 3.0 blueprints.
 
-MockAPI Studio is a 100% client-side developer utility built to design mock endpoints, configure dynamic JSON responses, simulate request latencies, and run test queries in an in-app interactive client. 
+## Visual Demo & UI Screenshot
 
-Abandoning sterile modern grid lines and harsh neon glows, the interface is designed around a warm **"Organized Chaos" Vintage Lithograph** aesthetic, treating software design with the tactile warmth and care of historical print medium.
+### Application Interface
+![MockAPI Studio Interface Screenshot](assets/mockapi_naturalist_ui.png)
 
----
+### Video Walkthrough
+Below is a screen recording demonstrating how to select an endpoint, configure path parameters, send test requests, view results, and inspect transaction logs:
 
-## 🎨 Visual Preview
+![MockAPI Studio Demo Walkthrough](assets/mockapi_studio_demo.webp)
 
-### Interface Dashboard Mockup
-![MockAPI Studio Handcrafted UI Concept](assets/mockapi_naturalist_ui.png)
+## Core Capabilities
 
-### Video Demonstration Tour
-Below is an interaction recording illustrating endpoint selection, parameter variables updates, simulated latency delays, and timeline log tracing:
+*   **Custom Mock Templates**: Define JSON responses using dynamic placeholders like `{{id}}`, `{{name}}`, `{{email}}`, `{{price}}`, and `{{date}}` to generate realistic mock data.
+*   **Array Expansion**: Create lists of items by specifying ranges or counts (e.g. `"users|3-6": { ... }` generates an array containing 3 to 6 randomized user records).
+*   **Path Variable Support**: Define routes with wildcard parameters (e.g. `/api/v1/users/:userId`). The request tester automatically detects these and lets you test responses referencing `{{params.userId}}`.
+*   **Latency Simulation**: Set response delay timers (0ms to 3000ms) to test frontend loading behaviors and slow-network fallbacks.
+*   **Interactive Tester (Mini-Postman)**: Customize query strings, headers, and request bodies directly inside the UI to inspect returned statuses, headers, and payloads.
+*   **Local Logger Timeline**: Keeps a history of simulated transactions. Click any logged card to expand and review request details.
+*   **Code Generators**: Instantly convert mocked routes into fully functional, zero-dependency Node.js/Express.js mock server scripts or standard OpenAPI 3.0 configurations.
 
-![MockAPI Studio Live Interaction Video](assets/mockapi_studio_demo.webp)
+## User Guide: How to Use the App
 
----
+You can operate the app fully without any coding background:
 
-## ✨ Key Features
+1.  **Load a Route**: Click any pre-loaded endpoint in the left **Endpoints** panel (e.g. `GET /api/v1/users/:userId`).
+2.  **Configure Parameters**: In the right **Request Tester** panel under the **Params** tab, enter a value for the `:userId` path variable (for example, replace `1` with `42`).
+3.  **Trigger Test Request**: Click **Send**. The app simulates your configured network delay, generates mock data, and displays the response payload in the viewer.
+4.  **Inspect Logs**: In the **Request Logs** timeline at the bottom-right, click any card to open a details modal displaying exact HTTP status codes, latency duration, size, and header values.
+5.  **Simulate Server Failures**: In the center **Configure Endpoint** panel, change the **Status Code** input from `200` to `500` or `401` and click **Send** to see how the tester handles error states.
 
-*   **Tactile Naturalist Aesthetic**: Styled using custom CSS properties on a warm, antique cotton paper canvas background (`#fbf9f3`), fine ink outlines, high corner roundings (`20px-24px`), and soft, matte stamped HTTP method badges.
-*   **Dynamic Variable Engine**: Automatically parses standard placeholders (`{{id}}`, `{{name}}`, `{{email}}`, `{{avatar}}`, `{{company}}`, `{{city}}`, `{{date}}`, etc.) and generates randomized, realistic mock data on each execution.
-*   **Organized List Mocking**: Supports loop list expansion patterns (e.g. suffixing a key with `"users|3-6": { ... }` will dynamically generate between 3 and 6 distinct objects with unique details).
-*   **Wildcard Path Parameter Binding**: Supports Express-style wildcard variables (e.g. `/api/v1/users/:userId`). The request tester parses the URL variables dynamically and injects the values into your JSON response using `{{params.userId}}`.
-*   **Interactive Request Tester (Mini-Postman)**: Build request headers, query strings, or body payloads, hit **"Send"**, watch simulated network delay resolve (up to `3000ms`), and inspect returned status codes, headers, and formatted JSON.
-*   **Live Request Timeline logs**: Traces and logs each transaction. Click any card in the logs timeline to expand full request/response headers, body payloads, and size metrics.
-*   **One-Click Code Exporters**: Converts your custom mock setups directly into copy-pasteable, zero-dependency Node.js/Express mock servers or standard OpenAPI 3.0 specification documents.
+## Setup and Running
 
----
+Since this is a client-side Vite application, you can run it locally with standard Node.js tooling:
 
-## 📖 User Guide: How to Operate
-
-MockAPI Studio is designed to be fully operational without requiring any coding background.
-
-### 1. Navigating and Testing Existing Mocks
-1. Select one of the pre-loaded endpoints from the left-side **Endpoints** column (e.g., `GET /api/v1/users/:userId`).
-2. Go to the right-side **Request Tester** column. In the **Params** tab, you will see a list of path variables (like `:userId`) and query parameters.
-3. Change the value of `:userId` to any text or number (e.g., ` रहमान-123`).
-4. Click the terracotta **"Send"** button. The app will pulse with a loading indicator to simulate latency, then render your dynamically populated response (with your custom `:userId` injected into the output!).
-
-### 2. Simulating Network and Server Errors
-1. Select an endpoint.
-2. In the center column (**Configure Endpoint**), find the **Status Code** input field and type `401` (Unauthorized) or `500` (Internal Server Error).
-3. Adjust the **Response Delay** slider to `2000ms`.
-4. Click **Send** in the Request Tester. The tester will load for exactly 2 seconds and return your configured error status with a red indicator badge.
-
-### 3. Reviewing Transaction Logs
-1. Every request you run is saved in the **Request Logs** timeline at the bottom-right.
-2. Click on any log card to open the **Request Details Modal**. This displays the full request context, headers, processing duration, and response payloads.
-
----
-
-## 🛠️ Local Development & Running
-
-MockAPI Studio compiles with modern Vite tooling and runs entirely in the browser as a static web application.
-
-### Prerequisites
-*   Node.js (v18+)
-*   NPM
-
-### Setup and Start Dev Server
 ```bash
 # Clone the repository
 git clone https://github.com/RahmaanQuresh/-MockAPI-Studio.git
@@ -71,13 +44,8 @@ cd -MockAPI-Studio
 # Install dependencies
 npm install
 
-# Run local development server
+# Run the local development server
 npm run dev
 ```
-Open `http://localhost:5173` in your browser to interact with the application.
 
-### Build Production Bundle
-```bash
-npm run build
-```
-Vite compiles all compiled assets into the `dist/` directory, ready to be deployed to static hosting providers (such as GitHub Pages or Netlify).
+The app will start at `http://localhost:5173`.
